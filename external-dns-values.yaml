@@ -1,0 +1,76 @@
+---
+fullnameOverride: external-dns-mikrotik
+
+logLevel: debug
+logFormat: text
+
+interval: 5s
+sources: ["ingress", "service", "crd"]
+registry: txt
+txtOwnerId: default
+txtPrefix: k8s.
+domainFilters: []
+excludeDomains: []
+policy: sync
+
+provider:
+  name: webhook
+  webhook:
+    image:
+      repository: ghcr.io/mirceanton/external-dns-provider-mikrotik
+      tag: v1.4.2@sha256:8e2a68bdc37401eed7d61095a8cf205cafac973c767e67c223f18e98fd8ebb0f
+      pullPolicy: IfNotPresent
+    env:
+      - name: LOG_FORMAT
+        value: json
+      - name: LOG_LEVEL
+        value: debug
+
+      - name: MIKROTIK_DEFAULT_TTL
+        value: "1800"
+      - name: MIKROTIK_DEFAULT_COMMENT
+        value: Managed by ExternalDNS
+
+      - name: MIKROTIK_BASEURL
+        valueFrom:
+          secretKeyRef:
+            name: mikrotik-credentials
+            key: MIKROTIK_BASEURL
+      - name: MIKROTIK_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: mikrotik-credentials
+            key: MIKROTIK_USERNAME
+      - name: MIKROTIK_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mikrotik-credentials
+            key: MIKROTIK_PASSWORD
+      - name: MIKROTIK_SKIP_TLS_VERIFY
+        valueFrom:
+          secretKeyRef:
+            name: mikrotik-credentials
+            key: MIKROTIK_SKIP_TLS_VERIFY
+
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: http-webhook
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: http-webhook
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+
+extraArgs:
+  - --ignore-ingress-tls-spec
+  - --managed-record-types=A
+  - --managed-record-types=AAAA
+  - --managed-record-types=CNAME
+  - --managed-record-types=TXT
+  - --managed-record-types=MX
+  - --managed-record-types=SRV
+  - --managed-record-types=NS

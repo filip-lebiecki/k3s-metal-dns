@@ -1,3 +1,5 @@
+[Youtube video](https://youtu.be/jDQSKYKOgLA?si=ZXbjujI-Qm92YmUU)
+
 # K3s install
 
 ```

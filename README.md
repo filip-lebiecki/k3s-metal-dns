@@ -1,11 +1,11 @@
-# k3s install
+# K3s install
 
 ```
 curl -sfL https://get.k3s.io | sh -s - server --cluster-cidr=10.244.0.0/16 --service-cidr=10.96.0.0/16 --disable=servicelb
 install -D /etc/rancher/k3s/k3s.yaml .kube/config
 ```
 
-# metallb install
+# MetalLB install
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml
@@ -96,3 +96,4 @@ http://code.lab.local/
 ```
 ssh 192.168.10.200 ip dns static print
 ```
+
